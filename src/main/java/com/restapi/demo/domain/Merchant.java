@@ -4,11 +4,17 @@ package com.restapi.demo.domain;
 import io.swagger.annotations.ApiModelProperty;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.Type;
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -20,18 +26,17 @@ import java.util.Set;
 
 @Entity
 @Table(name = "MERCHANTS")
-public final class Merchant extends TimestampModel {
+@Valid
+public final class Merchant extends AuditModel {
 
     /**
      * Definitions for DB Entry Merchant
      */
-
     @Id
-    @NotNull
     @Column(nullable = false, name = "MERCHANT_ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(notes = "Database generated offer id")
-    private Integer id;
+    private Long id;
 
 
     @NotNull
@@ -41,9 +46,9 @@ public final class Merchant extends TimestampModel {
     @ApiModelProperty(notes= "Name of the merchant", required = true)
     private String merchantName;
 
-
     @Type(type="nstring")
     @Size(min = 6, max = 30)
+    @NotNull
     @Column(name = "PHONE_NUMBER")
     @ApiModelProperty(notes = "Phone number associated with merchant, can be null")
     // Alternatively Phonenumber class can be used for validity checks etc
@@ -55,24 +60,23 @@ public final class Merchant extends TimestampModel {
     @ApiModelProperty(notes = "Company associated with merchant")
     private String companyName;
 
-
-    //One may argue @Valid annotation is needed here for the offerSet but
-    //there might be cases where there are no offers associated to a merchant
-    // and such scenario would result in exception thrown by @Valid mapping
-    //however since Offer model entity checking is enforced any invalid
-    //fields within an offer object will be caught by the Offer model
-    //before they even make it to this set here
-    @OneToMany(cascade = CascadeType.ALL,
-                fetch = FetchType.EAGER,
-                mappedBy = "merchant")
-    @ApiModelProperty(notes = "List of associated offers with this merchant")
+    @OneToMany(mappedBy = "merchant")
     private Set<Offer> offersSet;
 
-    public Integer getId() {
+    public Set<Offer> getOffersSet() {
+        return offersSet;
+    }
+
+    public Merchant setOffersSet(Set<Offer> offersSet) {
+        this.offersSet = offersSet;
+        return this;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public Merchant setId(Integer id) {
+    public Merchant setId(Long id) {
         this.id = id;
         return this;
     }
@@ -104,9 +108,6 @@ public final class Merchant extends TimestampModel {
         return this;
     }
 
-    public Set<Offer> getOffersSet() {
-        return offersSet;
-    }
 
     public Merchant setCreatedAt(ZonedDateTime createdAt)
     {
@@ -120,19 +121,35 @@ public final class Merchant extends TimestampModel {
         return this;
     }
 
-    public Merchant setOffersSet(Set<Offer> offersSet) {
-        this.offersSet = offersSet;
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Merchant merchant = (Merchant) o;
+        return Objects.equals(id, merchant.id) &&
+                Objects.equals(merchantName, merchant.merchantName) &&
+                Objects.equals(phonenumber, merchant.phonenumber) &&
+                Objects.equals(companyName, merchant.companyName) &&
+                offersSet.containsAll(merchant.offersSet);
+
+
+    }
+
+    @Override
+    public int hashCode() {
+        //Excluding the offer set since since we will end up with infinite recursive call
+        return Objects.hash(id, merchantName, phonenumber, companyName, 31);
     }
 
     @Override
     public String toString() {
+
+
         return "Merchant{" +
                 "id=" + id +
                 ", merchantName='" + merchantName + '\'' +
                 ", phonenumber='" + phonenumber + '\'' +
                 ", companyName='" + companyName + '\'' +
-                ", offersSet=" + offersSet + '\'' +
                 ","  + super.toString() + '\''+
                 '}';
     }

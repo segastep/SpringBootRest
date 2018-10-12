@@ -1,79 +1,90 @@
 package com.restapi.demo.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import com.restapi.demo.enums.OfferState;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
+import java.util.Objects;
+
 /**
  * @author G.Nikolov on 10/10/18
  * @project rest-service-
- * Offer DTO
+ *
  */
 @Entity
 @Table(name = "OFFERS")
-public final class Offer extends TimestampModel {
+@Valid
+public final class Offer extends AuditModel {
 
     @Id
-    @NotNull
+    @NotNull(message = "Id cannot be null")
     @Column(nullable = false, name = "OFFER_ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(notes = "Database generated offer id")
-    private Integer id;
+    private Long id;
 
 
     @Lob
-    @NotNull
+    @NotNull(message = "Description cannot be null")
     @Column(nullable = false, name = "DESCRIPTION")
+    @Size(min = 10, message = "Description should be at least {min} characters long")
     @Type(type ="org.hibernate.type.StringType")
     @ApiModelProperty(notes= "Offer's description", required = true)
     private String description;
 
-    //In general here we can handle this using Money object,
+    //In general here we can handle this using MonetaryAmount object,
     // but splitting the entry into price and currency
     // allows independent updates for each value and hence it's easier to implement
-    @NotNull
+    //And validated with CurrencyValidatorForMonetaryAmount
+    @NotNull(message = "Price cannot be null")
     @Column(nullable = false, name = "PRICE", precision = 6)
     @ApiModelProperty(notes = "Price of product")
     private Long price;
 
     //It would be more convenient currency to be changed either to currency type
-    // in real life application or as explained above to be handled by Money type
-    @NotNull
+    // in real life application or as explained above to be handled by Money/MonetaryAmount type
+    @NotNull(message = "Currency type cannot be null")
     @Column(nullable = false, name = "CURRENCY")
     @ApiModelProperty(notes = "Price's currency")
     @Type(type = "org.hibernate.type.CurrencyType")
-    @Size(min=3, max=3)
+    @Size(min=3, max=3, message = "Currency type must be of fixed length 3")
     private String currency;
 
-    @NotNull
+    @NotNull(message = "Valid until field cannot be null")
     //@Temporal(TemporalType.TIMESTAMP)
     @Column(name = "VALID_UNTIL")
     @ApiModelProperty(notes = "Offer expiry time")
     @JsonFormat(timezone = "UTC", pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime validUntil;
 
-    @NotNull
+    @NotNull(message = "Offer state cannot be null !")
     @Enumerated(EnumType.STRING)
     @Column(name = "OFFER_STATE")
     @ApiModelProperty(notes = "Status of offer")
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     private OfferState offerState;
 
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Merchant.class)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonProperty("merchant_id")
     private Merchant merchant;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public Offer setId(Integer id) {
+    public Offer setId(Long id) {
         this.id = id;
         return this;
     }
@@ -142,6 +153,28 @@ public final class Offer extends TimestampModel {
     {
         super.setUpdatedAt(updatedAt);
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Offer offer = (Offer) o;
+        return Objects.equals(id, offer.id) &&
+                Objects.equals(description, offer.description) &&
+                Objects.equals(price, offer.price) &&
+                Objects.equals(currency, offer.currency) &&
+                Objects.equals(validUntil, offer.validUntil) &&
+                offerState == offer.offerState &&
+                //Only use ID or we will end in infinite recursion
+                Objects.equals(merchant.getId(), offer.merchant.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        //using id for the same reason as above
+        return Objects.hash(id, description, price, currency,
+                validUntil, offerState, merchant.getId());
     }
 
     @Override

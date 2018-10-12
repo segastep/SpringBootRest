@@ -8,11 +8,13 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
+
 }
 
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
+apply plugin: 'jacoco'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -31,10 +33,6 @@ dependencies {
     //Data Handling
     //compile group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '7.0'
 
-    //Logging
-    compile('org.apache.logging.log4j:log4j-api:2.11.1')
-    compile('org.apache.logging.log4j:log4j-core:2.11.1')
-
     //Documentation, front-end
     compile('io.springfox:springfox-swagger2:2.9.2')
     compile('io.springfox:springfox-swagger-ui:2.9.2')
@@ -45,7 +43,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-parent:2.0.5.RELEASE')
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation('org.springframework.boot:spring-boot-starter-data-rest')
-
+    runtimeOnly('org.springframework.boot:spring-boot-starter-logging')
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
 
     //Data storage/DAO
@@ -64,15 +62,41 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.rest-assured:rest-assured:3.1.1')
     testCompile('org.assertj:assertj-core:3.11.1')
-
-    //Junit5 and back test compatibility
-    testCompileOnly('junit:junit:4.12')
-    //Don't uncomment these two since there is no native support for Junit5 in Spring boot 2
-    //testImplementation('org.junit.jupiter:junit-jupiter-api:5.3.1')
-    //testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.3.1')
+    testCompile('junit:junit:4.12')
+}
 
 
 
+jacocoTestReport {
+    reports {
+        xml.enabled = false
+        csv.enabled = false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
 
-	
+
+
+test {
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true
+
+    // set heap size for the test JVM(s)
+    minHeapSize = "128m"
+    maxHeapSize = "1024m"
+
+    // listen to events in the test execution lifecycle
+    beforeTest {
+        descriptor -> logger.lifecycle("Running test: " + descriptor)
+    }
+
+    // listen to standard out and standard error of the test JVM(s)
+    onOutput {
+        descriptor, event -> logger.lifecycle
+        ("Test: " + descriptor + " produced standard out/err: " + event.message )
+    }
 }

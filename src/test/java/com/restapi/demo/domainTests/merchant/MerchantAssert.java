@@ -1,12 +1,9 @@
-package com.restapi.demo.domainTests;
+package com.restapi.demo.domainTests.merchant;
 
 import com.restapi.demo.domain.Merchant;
-import com.restapi.demo.test.utils.TestUtils;
+import com.restapi.demo.testutils.TestUtils;
 import org.assertj.core.api.AbstractAssert;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,19 +13,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author G.Nikolov on 10/10/18
  * @project rest-service-basic
+ * Api like class to ease writing Merchant assertions
  */
 
 final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
 
     private MerchantAssert(Merchant actual)
     {
-        super(actual, Merchant.class);
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        super(actual, MerchantAssert.class);
 
     }
 
-    static MerchantAssert assertThatMerchantEntry(Merchant actual)
+    public static MerchantAssert assertThatMerchantEntry(Merchant actual)
     {
         return new MerchantAssert(actual);
     }
@@ -36,9 +32,7 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
     MerchantAssert hasName(String expectedName)
     {
         isNotNull();
-        //Set<ConstraintViolation<Merchant>> violations
-        //        = validator.validate(player)
-        //
+
         String actualName  = actual.getMerchantName();
         assertThat(actualName)
                 .overridingErrorMessage(
@@ -49,11 +43,11 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return this;
     }
 
-    MerchantAssert hasId(Integer expectedId)
+    MerchantAssert hasId(Long expectedId)
     {
         isNotNull();
 
-        Integer actualId = actual.getId();
+        Long actualId = actual.getId();
         assertThat(actualId).overridingErrorMessage(
                 "Expected id to be <%d> but was <%d>", expectedId, actualId
         ).isEqualTo(expectedId);
@@ -90,7 +84,6 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
                 "Expected company name to be <%s> but was <%s>",
                                 expectedCompanyName, actualCompanyName
         ).isEqualTo(expectedCompanyName);
-
         return this;
     }
 
@@ -113,21 +106,20 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return (String) s.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
-    MerchantAssert hasOffersSet(Set expectedOfferSet)
+    MerchantAssert hasOffersSet(Merchant expectedOfferSet)
     {
 
         isNotNull();
-        Set actualOfferSet = actual.getOffersSet();
 
-        assertThat(actualOfferSet).overridingErrorMessage(
-                "Expected offers set is different from actual offers set \n " +
-                        "Expected: <%s> \n Actual: <%s>", printSet(expectedOfferSet), printSet(actualOfferSet)
-        ).isEqualTo(expectedOfferSet);
-
+       assertThat(actual.getOffersSet()).overridingErrorMessage(
+               "Expected offers set is different from actual offers set \n " +
+                       "Expected: <%s> \n Actual: <%s>", printSet(expectedOfferSet.getOffersSet()), printSet(actual.getOffersSet())
+       ).isEqualTo(expectedOfferSet.getOffersSet());
+        //assertEquals(expectedOfferSet.getOffersSet(),actual.getOffersSet());
         return this;
     }
 
-    MerchantAssert hasNoOffersSer()
+    MerchantAssert hasNoOffersSet()
     {
         Set actualOfferSet = actual.getOffersSet();
         assertThat(actualOfferSet).overridingErrorMessage(
@@ -138,7 +130,7 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return this;
     }
 
-    public MerchantAssert createdAt(String creationTime)
+     MerchantAssert createdAt(String creationTime)
     {
         isNotNull();
 

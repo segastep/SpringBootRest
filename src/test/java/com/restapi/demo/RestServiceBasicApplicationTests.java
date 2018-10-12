@@ -2,7 +2,6 @@ package com.restapi.demo;
 
 import io.restassured.RestAssured;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,16 +11,17 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = RestServiceBasicApplication.class)
-@TestPropertySource(value = {"claspath: application.properties"})
+@TestPropertySource(value = {"classpath:application.properties"})
 @EntityScan(basePackages = "com.restapi.demo.domain")
 @EnableJpaRepositories(basePackages = "com.restapi.demo.repostitories")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestServiceBasicApplicationTests {
 
-    @Value("{server.port}")
+    @Value("${server.port}")
     int port;
 
     @Before
@@ -29,17 +29,16 @@ public class RestServiceBasicApplicationTests {
     {
         RestAssured.port = port;
         RestAssured.baseURI = "http://localhost";
+
     }
 
     @Test
-    @Ignore
     public void getDataTest()
     {
         RestAssured.get();
     }
 
     @Test
-    @Ignore
 	public void contextLoads()
     {
 	}

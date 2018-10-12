@@ -1,4 +1,4 @@
-package com.restapi.demo.test.utils;
+package com.restapi.demo.testutils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;

@@ -27,7 +27,7 @@ import java.time.ZonedDateTime;
         value = { "createdAt", "updatedAt"},
         allowGetters = true
 )
-public abstract class TimestampModel implements Serializable {
+public abstract class AuditModel implements Serializable {
 
     /**
      * Temporal(TemporalType.TIMESTAMP) annotation
@@ -53,7 +53,7 @@ public abstract class TimestampModel implements Serializable {
         return updatedAt;
     }
 
-    public TimestampModel setUpdatedAt(ZonedDateTime updatedAt) {
+    public AuditModel setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
         return this;
     }
@@ -62,14 +62,14 @@ public abstract class TimestampModel implements Serializable {
         return createdAt;
     }
 
-    public TimestampModel setCreatedAt(ZonedDateTime createdAt) {
+    public AuditModel setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }
 
     @Override
     public String toString() {
-        return "TimestampModel{" +
+        return "AuditModel{" +
                 "updatedAt=" + updatedAt +
                 ", createdAt=" + createdAt +
                 '}';
