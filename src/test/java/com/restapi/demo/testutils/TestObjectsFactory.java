@@ -18,40 +18,42 @@ import java.util.Set;
  */
 public class TestObjectsFactory {
     //Constants used to build Merchant object
-    private static final Long TEST_ID = Long.valueOf("1");
+    public static final Long TEST_ID = Long.valueOf("1");
 
-    private static final String  MERCHANT_NAME  = "TEST_USER";
-    private static final String  PHONE_NUMBER   = "+44784000000";
-    private static final String  COMPANY_NAME   = "TEST_COMPANY";
-    private static final String  CREATION_DATE  = "2000-10-07T22:28:39+00:00";
-    private static final String  UPDATED_ON     = "2000-10-07T23:00:00+00:00";
+    public static final String  MERCHANT_NAME  = "TEST_USER";
+    public static final String  PHONE_NUMBER   = "+44784000000";
+    public static final String  COMPANY_NAME   = "TEST_COMPANY";
+    public static final String  CREATION_DATE  = "2000-10-07T22:28:39+00:00";
+    public static final String  UPDATED_ON     = "2000-10-07T23:00:00+00:00";
 
 
     //Constants for Offer object which will be put in Merchant's offerSet
-    private static final Long OFFER_ID = Long.valueOf("100");
+    public static final Long OFFER_ID = Long.valueOf("100");
 
-    private static final String  OFFER_CREATED_AT = "2010-10-07T22:28:39+00:00";
-    private static final String  OFFER_UPDATED_AT = "2010-11-07T22:28:39+00:00";
-    private static final String  OFFER_EXPIRES_AT = "2010-11-08T22:28:39+00:00";
-    private static final String  OFFER_DESCRIPT   = "Some test test string";
-    private static final String  OFFER_CURRENCY   = "GBP";
+    public static final String  OFFER_CREATED_AT = "2010-10-07T22:28:39+00:00";
+    public static final String  OFFER_UPDATED_AT = "2010-11-07T22:28:39+00:00";
+    public static final String  OFFER_EXPIRES_AT = "2010-11-08T22:28:39+00:00";
+    public static final String  OFFER_DESCRIPT   = "Some test test string";
+    public static final String  OFFER_CURRENCY   = "GBP";
 
-    private static final Long    OFFER_PRICE      =  Long.valueOf("123456");
+    public static final Long    OFFER_PRICE      =  Long.valueOf("123456");
 
-    private static final OfferState OFFER_STATE   = OfferState.ACTIVE;
+    public static final OfferState OFFER_STATE   = OfferState.ACTIVE;
 
 
     public static Offer getOfferInstanceWithOutMerchant()
     {
-        return new Offer()
+        Offer offer = new Offer()
                 .setId(OFFER_ID)
-                .setCreatedAt(TestUtils.dateTimeParser(OFFER_CREATED_AT))
-                .setUpdatedAt(TestUtils.dateTimeParser(OFFER_UPDATED_AT))
                 .setValidUntil(TestUtils.dateTimeParser(OFFER_EXPIRES_AT))
                 .setPrice(OFFER_PRICE)
                 .setCurrency(OFFER_CURRENCY)
                 .setDescription(OFFER_DESCRIPT)
                 .setOfferState(OFFER_STATE);
+        offer.setCreatedAt(TestUtils.dateTimeParser(OFFER_CREATED_AT).toInstant());
+        offer.setUpdatedAt(TestUtils.dateTimeParser(OFFER_UPDATED_AT).toInstant());
+        return offer;
+
     }
 
     public static Offer getOfferInstanceWithMerchant(Merchant merchant)
@@ -66,13 +68,15 @@ public class TestObjectsFactory {
 
     public static Merchant getMerchantInstanceEmptyOfferSet()
     {
-        return new Merchant()
+        Merchant m = new Merchant()
                 .setId(TEST_ID)
                 .setMerchantName(MERCHANT_NAME)
                 .setCompanyName(COMPANY_NAME)
-                .setPhonenumber(PHONE_NUMBER)
-                .setCreatedAt(TestUtils.dateTimeParser(CREATION_DATE))
-                .setUpdatedAt(TestUtils.dateTimeParser(UPDATED_ON));
+                .setPhonenumber(PHONE_NUMBER);
+                m.setCreatedAt(TestUtils.dateTimeParser(CREATION_DATE).toInstant());
+                m.setUpdatedAt(TestUtils.dateTimeParser(UPDATED_ON).toInstant());
+
+                return m;
     }
 
     public static Merchant getAmerchantInstanceWithOfferSet(int numberOfOffers)

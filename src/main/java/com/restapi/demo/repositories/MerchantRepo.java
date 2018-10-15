@@ -1,10 +1,14 @@
 package com.restapi.demo.repositories;
 
 import com.restapi.demo.domain.Merchant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.scheduling.annotation.Async;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -16,24 +20,37 @@ import java.util.Optional;
  * Repository to provide CRUD operations for
  * {@link com.restapi.demo.domain.Merchant} objects
  */
-//@RepositoryRestResource
-public interface MerchantRepo extends CrudRepository<Merchant, Integer> {
+@RepositoryRestResource
+@AutoConfigurationPackage
+public interface MerchantRepo extends CrudRepository<Merchant, Long> {
 
+    @Async
+    Optional<Merchant> findById(Long id);
+
+    @Async
+    List<Merchant> findAllByMerchantName(String merchantName);
+
+    @Async
+    Page<Merchant> findAllByMerchantName(String merchantName,Pageable page);
+
+    @Async
+    List<Merchant> findAllByCompanyName(String companyName);
+
+    @Async
+    Iterable<Merchant> findAll();
+
+    @Async
+    Page<Merchant> findAllByCompanyName(String companyName, Pageable page);
+
+    @Async
     void delete(Merchant toDelete);
 
-    List<Merchant> findAll();
+    @Async
+    Page<Merchant> findAll(Pageable pageReq);
 
-    /**
-     *
-     * @param //pageReq Number of page to be returned
-     * @return  A page of Merchant entries
-     */
-    //Page<Merchant> findAllPaginated(Pageable pageReq);
+    void deleteAllByCompanyName(String companyName);
 
-    Optional<Merchant> findById(Integer id);
+    void deleteAll();
 
-    void flush();
-
-    Merchant save(Merchant persist);
 
 }

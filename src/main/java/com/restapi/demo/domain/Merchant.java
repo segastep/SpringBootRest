@@ -7,15 +7,18 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author G.Nikolov on 10/10/18
@@ -27,7 +30,7 @@ import java.util.Set;
 @Entity
 @Table(name = "MERCHANTS")
 @Valid
-public final class Merchant extends AuditModel {
+public final class Merchant extends AuditModel<String>{
 
     /**
      * Definitions for DB Entry Merchant
@@ -60,11 +63,21 @@ public final class Merchant extends AuditModel {
     @ApiModelProperty(notes = "Company associated with merchant")
     private String companyName;
 
-    @OneToMany(mappedBy = "merchant")
-    private Set<Offer> offersSet;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "merchants", referencedColumnName = "MERCHANT_ID", nullable = false)
+    private Set<Offer> offersSet = new HashSet<>();
 
+    //This setter only to be used for entity testing, using it with JPA
+    // will cause persistent collection to be overwritten
     public Set<Offer> getOffersSet() {
-        return offersSet;
+        return Collections.unmodifiableSet(this.offersSet);
+    }
+
+    //JPA to be used with addOffer method only !
+    public void addOffer(Offer offer)
+    {
+        offer.setMerchant(this);
+        this.offersSet.add(offer);
     }
 
     public Merchant setOffersSet(Set<Offer> offersSet) {
@@ -109,18 +122,6 @@ public final class Merchant extends AuditModel {
     }
 
 
-    public Merchant setCreatedAt(ZonedDateTime createdAt)
-    {
-        super.setCreatedAt(createdAt);
-        return this;
-    }
-
-    public Merchant setUpdatedAt(ZonedDateTime updatedAt)
-    {
-        super.setUpdatedAt(updatedAt);
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -131,7 +132,6 @@ public final class Merchant extends AuditModel {
                 Objects.equals(phonenumber, merchant.phonenumber) &&
                 Objects.equals(companyName, merchant.companyName) &&
                 offersSet.containsAll(merchant.offersSet);
-
 
     }
 

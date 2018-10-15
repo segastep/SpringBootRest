@@ -4,7 +4,7 @@ import com.restapi.demo.domain.Merchant;
 import com.restapi.demo.testutils.TestUtils;
 import org.assertj.core.api.AbstractAssert;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -130,32 +130,32 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return this;
     }
 
-     MerchantAssert createdAt(String creationTime)
-    {
-        isNotNull();
+    MerchantAssert createdAt(String creationTime)
+   {
+       isNotNull();
 
-        ZonedDateTime expectedCreationTime = TestUtils.dateTimeParser(creationTime);
-        ZonedDateTime actualCreationTime = actual.getCreatedAt();
+       Instant expectedCreationTime = TestUtils.dateTimeParser(creationTime).toInstant();
+       Instant actualCreationTime = actual.getCreatedAt();
 
-        assertThat(actualCreationTime).overridingErrorMessage(
-                "Expected creation time to be <%s> but was <%s>",
-                                expectedCreationTime, actualCreationTime
-        ).isEqualTo(expectedCreationTime);
+       assertThat(actualCreationTime).overridingErrorMessage(
+               "Expected creation time to be <%s> but was <%s>",
+                               expectedCreationTime, actualCreationTime
+       ).isEqualTo(expectedCreationTime);
 
-        return this;
-    }
+       return this;
+   }
 
-    public MerchantAssert updatedAt(String expLastUpdatedTime)
-    {
-        ZonedDateTime expectedLastUpdatedTime = TestUtils.dateTimeParser(expLastUpdatedTime);
-        ZonedDateTime actualLastUpdatedTime = actual.getUpdatedAt();
+   public MerchantAssert updatedAt(String expLastUpdatedTime)
+   {
+       Instant expectedLastUpdatedTime = TestUtils.dateTimeParser(expLastUpdatedTime).toInstant();
+       Instant actualLastUpdatedTime = actual.getUpdatedAt();
 
-        assertThat(actualLastUpdatedTime).overridingErrorMessage(
-                "Expected last update time was <%s> but actual was <%s>",
-                                expectedLastUpdatedTime, actualLastUpdatedTime
-        ).isEqualTo(expectedLastUpdatedTime);
+       assertThat(actualLastUpdatedTime).overridingErrorMessage(
+               "Expected last update time was <%s> but actual was <%s>",
+                               expectedLastUpdatedTime, actualLastUpdatedTime
+       ).isEqualTo(expectedLastUpdatedTime);
 
-        return this;
-    }
+       return this;
+   }
 
 }

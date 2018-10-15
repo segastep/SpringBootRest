@@ -22,7 +22,7 @@ import java.util.Set;
 @ContextConfiguration(classes = MerchantTest.class)
 public class MerchantTest {
 
-    private static Logger logger = LogManager.getLogger(MerchantTest.class);
+    //private static Logger logger = LogManager.getLogger(MerchantTest.class);
     private Merchant testObj;
     private static final Long TEST_ID = Long.valueOf("1");
 

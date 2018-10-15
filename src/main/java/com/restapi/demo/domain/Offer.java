@@ -6,11 +6,14 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -25,7 +28,7 @@ import java.util.Objects;
 public final class Offer extends AuditModel {
 
     @Id
-    @NotNull(message = "Id cannot be null")
+    //@NotNull(message = "Id cannot be null")
     @Column(nullable = false, name = "OFFER_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(notes = "Database generated offer id")
@@ -54,7 +57,7 @@ public final class Offer extends AuditModel {
     @NotNull(message = "Currency type cannot be null")
     @Column(nullable = false, name = "CURRENCY")
     @ApiModelProperty(notes = "Price's currency")
-    @Type(type = "org.hibernate.type.CurrencyType")
+    @Type(type = "nstring")
     @Size(min=3, max=3, message = "Currency type must be of fixed length 3")
     private String currency;
 
@@ -140,18 +143,6 @@ public final class Offer extends AuditModel {
 
     public Offer setCurrency(String currency) {
         this.currency = currency;
-        return this;
-    }
-
-    public Offer setCreatedAt(ZonedDateTime createdAt)
-    {
-        super.setCreatedAt(createdAt);
-        return this;
-    }
-
-    public Offer setUpdatedAt(ZonedDateTime updatedAt)
-    {
-        super.setUpdatedAt(updatedAt);
         return this;
     }
 

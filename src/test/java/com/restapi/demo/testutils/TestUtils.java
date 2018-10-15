@@ -3,6 +3,7 @@ package com.restapi.demo.testutils;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.ByteArrayOutputStream;
@@ -29,6 +30,10 @@ public final class TestUtils {
         return ZonedDateTime.parse(dateNtime, DateTimeFormatter.ISO_ZONED_DATE_TIME);
     }
 
+    public static LocalDateTime dateTimeLocalParser(String dateTime)
+    {
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+    }
     public static Object deepCopy(Object object)
     {
         try {
