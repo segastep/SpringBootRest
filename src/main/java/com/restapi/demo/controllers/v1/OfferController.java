@@ -122,11 +122,10 @@ public class OfferController {
                         .setPrice(offerRequest.getPrice())
                         .setCurrency(offerRequest.getCurrency());
                 return offerRepo.save(offer);
-          }).orElseThrow(() -> new ResourceNotFoundException("On offer with id: " + offerId + "exists!"))
+          }).orElseThrow(() -> new ResourceNotFoundException("On offer with id: " + offerId + "exists!"));
     }
 
+
     
-
-
 
 }
