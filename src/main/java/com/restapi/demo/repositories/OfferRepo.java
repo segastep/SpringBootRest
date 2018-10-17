@@ -2,6 +2,7 @@ package com.restapi.demo.repositories;
 
 
 import com.restapi.demo.domain.Offer;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
  */
 
 @RepositoryRestResource
+@AutoConfigurationPackage
 public interface OfferRepo extends JpaRepository<Offer, Long> {
 
     @Async

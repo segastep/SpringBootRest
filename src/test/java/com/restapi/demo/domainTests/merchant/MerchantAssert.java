@@ -5,6 +5,7 @@ import com.restapi.demo.testutils.TestUtils;
 import org.assertj.core.api.AbstractAssert;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,36 +107,14 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return (String) s.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
-    MerchantAssert hasOffersSet(Merchant expectedOfferSet)
-    {
 
-        isNotNull();
-
-       assertThat(actual.getOffersSet()).overridingErrorMessage(
-               "Expected offers set is different from actual offers set \n " +
-                       "Expected: <%s> \n Actual: <%s>", printSet(expectedOfferSet.getOffersSet()), printSet(actual.getOffersSet())
-       ).isEqualTo(expectedOfferSet.getOffersSet());
-        //assertEquals(expectedOfferSet.getOffersSet(),actual.getOffersSet());
-        return this;
-    }
-
-    MerchantAssert hasNoOffersSet()
-    {
-        Set actualOfferSet = actual.getOffersSet();
-        assertThat(actualOfferSet).overridingErrorMessage(
-                "Expected offer set to be null but was <%s>",
-                printSet(actualOfferSet)
-        ).isNullOrEmpty();
-
-        return this;
-    }
 
     MerchantAssert createdAt(String creationTime)
    {
        isNotNull();
 
-       Instant expectedCreationTime = TestUtils.dateTimeParser(creationTime).toInstant();
-       Instant actualCreationTime = actual.getCreatedAt();
+       LocalDateTime expectedCreationTime = TestUtils.dateTimeLocalParser(creationTime);
+       LocalDateTime actualCreationTime = actual.getCreatedAt();
 
        assertThat(actualCreationTime).overridingErrorMessage(
                "Expected creation time to be <%s> but was <%s>",
@@ -147,8 +126,8 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
 
    public MerchantAssert updatedAt(String expLastUpdatedTime)
    {
-       Instant expectedLastUpdatedTime = TestUtils.dateTimeParser(expLastUpdatedTime).toInstant();
-       Instant actualLastUpdatedTime = actual.getUpdatedAt();
+       LocalDateTime expectedLastUpdatedTime = TestUtils.dateTimeLocalParser(expLastUpdatedTime);
+       LocalDateTime actualLastUpdatedTime = actual.getUpdatedAt();
 
        assertThat(actualLastUpdatedTime).overridingErrorMessage(
                "Expected last update time was <%s> but actual was <%s>",

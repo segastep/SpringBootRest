@@ -2,6 +2,7 @@ package com.restapi.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 
 import org.hibernate.annotations.Type;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 
@@ -28,34 +30,28 @@ import java.time.ZonedDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = { "createdAt", "updatedAt", "createdBy"},
+        value = {"createdAt", "updatedAt", "createdBy"},
         allowGetters = true
 )
+@Api(value="Model to audit entities, all timestamps are in SERVER'S LOCAL TIME")
 public abstract class AuditModel<U> implements Serializable {
 
-    /**
-     * Reason why using Instant, took quite awhile to figure it out, quite confusing since for normal
-     * entities ZonedDateTime is supported
-     * https://github.com/communicode/communikey-backend/commit/3ccb8ef9d978ac8ff5a0619d7de3855e98540e25
-     */
-
     @CreatedBy
+    @ApiModelProperty(notes = "Creator of resource",readOnly = true)
     @Column(name = "CREATED_BY", nullable = false)
     @Type(type = "nstring")
     private U createdBy;
 
 
     @Column(name = "UPDATED_AT", nullable = false)
-    @ApiModelProperty(notes = "Last time when offer was modified in instant type")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSZ",timezone = "UTC")
+    @ApiModelProperty(notes = "Last time when offer was modified in instant type", readOnly = true)
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     @CreatedDate
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
-    @ApiModelProperty(notes = "Time of creation of offer in instant type")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSZ",timezone = "UTC")
-    private Instant createdAt;
+    @ApiModelProperty(notes = "Creation time",readOnly = true)
+    private LocalDateTime createdAt;
 
     public void setCreatedBy(U createdBy)
     {
@@ -67,22 +63,22 @@ public abstract class AuditModel<U> implements Serializable {
         return this.createdBy;
     }
 
-    public Instant getUpdatedAt()
+    public LocalDateTime getUpdatedAt()
     {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt)
+    public void setUpdatedAt(LocalDateTime updatedAt)
     {
         this.updatedAt = updatedAt;
     }
 
-    public Instant getCreatedAt()
+    public LocalDateTime getCreatedAt()
     {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt)
+    public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
     }

@@ -1,17 +1,11 @@
 package com.restapi.demo.domainTests.merchant;
 
 import com.restapi.demo.domain.Merchant;
-import com.restapi.demo.domain.Offer;
 import com.restapi.demo.testutils.TestObjectsFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -36,7 +30,7 @@ public class MerchantTest {
     @Before
     public void setUp()
     {
-        testObj = TestObjectsFactory.getMerchantInstanceEmptyOfferSet();
+        testObj = TestObjectsFactory.getMerchantInstance();
     }
 
     @After
@@ -108,23 +102,4 @@ public class MerchantTest {
     {
         MerchantAssert.assertThatMerchantEntry(testObj).updatedAt(UPDATED_ON);
     }
-
-    @Test
-    public void merchantHashOfferSet()
-    {
-        Set<Offer> offers = new HashSet<>();
-        offers.add(TestObjectsFactory.getOfferInstanceWithMerchantAndCustomId(testObj, Long.valueOf(1)));
-        testObj.setOffersSet(offers);
-        //logger.info(testObj.getOffersSet().toString());
-        MerchantAssert.assertThatMerchantEntry(testObj
-        ).hasOffersSet(TestObjectsFactory.getAmerchantInstanceWithOfferSet(1));
-    }
-
-
-
-
-
-
-
-
 }

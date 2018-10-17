@@ -20,7 +20,7 @@ public class WebConfig {
     ServletRegistrationBean h2servletRegistration()
     {
         ServletRegistrationBean regBean = new ServletRegistrationBean(new WebdavServlet());
-        regBean.addUrlMappings("/console/*");
+        regBean.addUrlMappings("/h2-console/*");
         return regBean;
     }
 }

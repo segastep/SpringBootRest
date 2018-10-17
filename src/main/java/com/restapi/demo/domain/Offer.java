@@ -6,14 +6,14 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "OFFERS")
 @Valid
-public final class Offer extends AuditModel {
+public final class Offer extends AuditModel<String>{
 
     @Id
     //@NotNull(message = "Id cannot be null")
@@ -39,7 +39,6 @@ public final class Offer extends AuditModel {
     @NotNull(message = "Description cannot be null")
     @Column(nullable = false, name = "DESCRIPTION")
     @Size(min = 10, message = "Description should be at least {min} characters long")
-    @Type(type ="org.hibernate.type.StringType")
     @ApiModelProperty(notes= "Offer's description", required = true)
     private String description;
 
@@ -62,30 +61,30 @@ public final class Offer extends AuditModel {
     private String currency;
 
     @NotNull(message = "Valid until field cannot be null")
-    //@Temporal(TemporalType.TIMESTAMP)
     @Column(name = "VALID_UNTIL")
     @ApiModelProperty(notes = "Offer expiry time")
-    @JsonFormat(timezone = "UTC", pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime validUntil;
 
-    @NotNull(message = "Offer state cannot be null !")
+    //@NotNull(message = "Offer state cannot be null !")
     @Enumerated(EnumType.STRING)
-    @Column(name = "OFFER_STATE")
-    @ApiModelProperty(notes = "Status of offer")
-    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+    @Column(name = "OFFER_STATE", nullable = false)
+    @ApiModelProperty(notes = "Status of offer", readOnly = true)
     private OfferState offerState;
 
+    public Long getId() {
+        return id;
+    }
+
+    //All fields of merchnat object will be rendered in post request in
+    // swagger UI different post/request schemas will be supported as of
+    //swagger 3.00 :(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @JsonProperty("merchant_id")
-    private Merchant merchant;
-
-    public Long getId() {
-        return id;
-    }
+    //@ApiModelProperty(notes = "The id of the merchant owning the offer")
+    protected Merchant merchant;
 
     public Offer setId(Long id) {
         this.id = id;

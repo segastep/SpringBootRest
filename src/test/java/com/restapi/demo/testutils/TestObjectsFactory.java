@@ -50,8 +50,8 @@ public class TestObjectsFactory {
                 .setCurrency(OFFER_CURRENCY)
                 .setDescription(OFFER_DESCRIPT)
                 .setOfferState(OFFER_STATE);
-        offer.setCreatedAt(TestUtils.dateTimeParser(OFFER_CREATED_AT).toInstant());
-        offer.setUpdatedAt(TestUtils.dateTimeParser(OFFER_UPDATED_AT).toInstant());
+        offer.setCreatedAt(TestUtils.dateTimeLocalParser(OFFER_CREATED_AT));
+        offer.setUpdatedAt(TestUtils.dateTimeLocalParser(OFFER_UPDATED_AT));
         return offer;
 
     }
@@ -66,36 +66,36 @@ public class TestObjectsFactory {
         return getOfferInstanceWithMerchant(merchant).setId(id);
     }
 
-    public static Merchant getMerchantInstanceEmptyOfferSet()
+    public static Merchant getMerchantInstance()
     {
         Merchant m = new Merchant()
                 .setId(TEST_ID)
                 .setMerchantName(MERCHANT_NAME)
                 .setCompanyName(COMPANY_NAME)
                 .setPhonenumber(PHONE_NUMBER);
-                m.setCreatedAt(TestUtils.dateTimeParser(CREATION_DATE).toInstant());
-                m.setUpdatedAt(TestUtils.dateTimeParser(UPDATED_ON).toInstant());
+                m.setCreatedAt(TestUtils.dateTimeLocalParser(CREATION_DATE));
+                m.setUpdatedAt(TestUtils.dateTimeLocalParser(UPDATED_ON));
 
                 return m;
     }
 
-    public static Merchant getAmerchantInstanceWithOfferSet(int numberOfOffers)
-    {
-
-        //Merchant merchantOfferCopy = (Merchant) TestUtils.deepCopy(merchantTestObject);
-        Merchant merchantTestObject = getMerchantInstanceEmptyOfferSet();
-        Offer offerTestObject = getOfferInstanceWithMerchant(merchantTestObject).setMerchant(merchantTestObject);
-
-        Set<Offer> o = new HashSet<>();
-
-        for(int i = 1; i <= numberOfOffers; i++)
-        {
-            o.add(offerTestObject.setId(new Long(i)));
-
-        }
-        merchantTestObject.setOffersSet(o);
-
-        return merchantTestObject;
-    }
+//    public static Merchant getAmerchantInstanceWithOfferSet(int numberOfOffers)
+//    {
+//
+//        //Merchant merchantOfferCopy = (Merchant) TestUtils.deepCopy(merchantTestObject);
+//        Merchant merchantTestObject = getMerchantInstance();
+//        Offer offerTestObject = getOfferInstanceWithMerchant(merchantTestObject).setMerchant(merchantTestObject);
+//
+//        Set<Offer> o = new HashSet<>();
+//
+//        for(int i = 1; i <= numberOfOffers; i++)
+//        {
+//            o.add(offerTestObject.setId(new Long(i)));
+//
+//        }
+//        merchantTestObject.setOffersSet(o);
+//
+//        return merchantTestObject;
+//    }
 
 }

@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
@@ -31,11 +32,10 @@ import static org.junit.Assert.*;
  * @author G.Nikolov on 14/10/18
  * @project rest-service-basic
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest
 @EnableJpaRepositories(basePackages = "com.restapi.demo.repositories")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ComponentScan(basePackages = {"com.restapi.demo"})
-@Transactional
 @RunWith(SpringRunner.class)
 public class OfferRepoTest {
 
@@ -51,38 +51,63 @@ public class OfferRepoTest {
     @Before
     public void setUp()
     {
-        merchantObj = TestObjectsFactory.getMerchantInstanceEmptyOfferSet();
+        merchantObj = TestObjectsFactory.getMerchantInstance();
         offerObj = TestObjectsFactory.getOfferInstanceWithOutMerchant();
-        merchantObj.addOffer(offerObj);
+        merchantRepo.save(merchantObj);
+
     }
 
-    public void addNumberOfOffersToMerchant(int number)
+    @Test
+    public void testSave()
+    {
+        Offer o = new Offer().setId(null).setValidUntil(
+                TestUtils.dateTimeParser(TestObjectsFactory.OFFER_EXPIRES_AT)
+                )
+                .setMerchant(merchantObj)
+                .setCurrency("GBP")
+                .setDescription("Awesome description")
+                .setPrice(new Long(100))
+                .setOfferState(OfferState.ACTIVE);
+
+        Offer persisted = offerRepo.save(o);
+        assertTrue(persisted.getId() > 0);
+    }
+
+    @Test
+    public void auditingTest()
+    {
+        assertNotNull(
+                offerRepo.save(
+                        TestObjectsFactory.getOfferInstanceWithMerchant(merchantObj)
+                ).getCreatedAt()
+        );
+    }
+
+    public void persistNumberOfOffers(int number)
     {
         //Offers are auto persisted by merchant entity
-        for(int i = 1; i <= number-1; i++)
+        for(int i = 1; i <= number; i++)
         {
 
             Offer o = TestObjectsFactory
                     .getOfferInstanceWithMerchantAndCustomId
-                            (merchantObj, Long.valueOf(offerObj.getId()+i));
+                            (merchantObj, Long.valueOf(i));
 
-            merchantObj.addOffer(o);
+            offerRepo.save(o);
         }
     }
     @Test
     public void testFindAllOffers()
     {
 
-        addNumberOfOffersToMerchant(10);
-        merchantRepo.save(merchantObj);
+        persistNumberOfOffers(10);
         assertEquals(10,offerRepo.findAll().size());
     }
 
     @Test
     public void testFindAllByMerchantIdPaginated()
     {
-        addNumberOfOffersToMerchant(12);
-        merchantRepo.save(merchantObj);
+        persistNumberOfOffers(12);
         int pageSize = 5;
         Pageable pageable = PageRequest.of(2,pageSize);
         Page<Offer> fetchedOffers = offerRepo.findAllByMerchantId(merchantObj.getId(),pageable);
@@ -92,8 +117,7 @@ public class OfferRepoTest {
     @Test
     public void testFindAllPaginated()
     {
-        addNumberOfOffersToMerchant(2);
-        merchantRepo.save(merchantObj);
+        persistNumberOfOffers(2);
         int pageSize = 1;
         Pageable pageable = PageRequest.of(1,pageSize);
         Page<Offer> fetchedOffers = offerRepo.findAll(pageable);
@@ -116,11 +140,10 @@ public class OfferRepoTest {
         Offer expired = TestObjectsFactory.getOfferInstanceWithOutMerchant()
                 .setValidUntil(TestUtils.dateTimeParser("2018-10-09T22:28:39+00:00"))
                 .setOfferState(OfferState.EXPIRED).setId(null);
-        merchantObj.addOffer(valid);
-        merchantObj.addOffer(valid1);
-        merchantObj.addOffer(valid2);
-        merchantObj.addOffer(expired);
-        merchantRepo.save(merchantObj);
+        offerRepo.save(valid.setMerchant(merchantObj));
+        offerRepo.save(valid1.setMerchant(merchantObj));
+        offerRepo.save(valid2.setMerchant(merchantObj));
+        offerRepo.save(expired.setMerchant(merchantObj));
         int pageSize = 3;
         Pageable pageable = PageRequest.of(0,pageSize);
         assertEquals(3,offerRepo.findAllByValidUntilIsGreaterThan(criteria, pageable).getContent().size());
@@ -142,18 +165,13 @@ public class OfferRepoTest {
         Offer valid = TestObjectsFactory.getOfferInstanceWithOutMerchant()
                 .setValidUntil(TestUtils.dateTimeParser("2018-10-09T22:28:55+00:00"))
                 .setOfferState(OfferState.ACTIVE).setId(null);
-        merchantObj.addOffer(invalid);
-        merchantObj.addOffer(invalid1);
-        merchantObj.addOffer(invalid2);
-        merchantObj.addOffer(valid);
-        merchantRepo.save(merchantObj);
+        offerRepo.save(invalid.setMerchant(merchantObj));
+        offerRepo.save(invalid1.setMerchant(merchantObj));
+        offerRepo.save(invalid2.setMerchant(merchantObj));
+        offerRepo.save(valid.setMerchant(merchantObj));
         int pageSize = 3;
         Pageable pageable = PageRequest.of(0,pageSize);
-        Pageable pageable1 = PageRequest.of(1,pageSize);
-        //One extra offer from setUp method
         assertEquals(3,offerRepo.findAllByValidUntilIsLessThan(criteria, pageable).getContent().size());
-        //Next page should have 1 element since we added offer with expirity date 2010 in setUp method
-        assertEquals(1,offerRepo.findAllByValidUntilIsLessThan(criteria, pageable1).getContent().size());
     }
 
 
@@ -173,11 +191,10 @@ public class OfferRepoTest {
         Offer expired = TestObjectsFactory.getOfferInstanceWithOutMerchant()
                 .setValidUntil(TestUtils.dateTimeParser("2018-10-09T22:28:39+00:00"))
                 .setOfferState(OfferState.EXPIRED).setId(null);
-        merchantObj.addOffer(valid);
-        merchantObj.addOffer(valid1);
-        merchantObj.addOffer(valid2);
-        merchantObj.addOffer(expired);
-        merchantRepo.save(merchantObj);
+        offerRepo.save(valid.setMerchant(merchantObj));
+        offerRepo.save(valid1.setMerchant(merchantObj));
+        offerRepo.save(valid2.setMerchant(merchantObj));
+        offerRepo.save(expired.setMerchant(merchantObj));
         int pageSize = 3;
         Pageable pageable = PageRequest.of(0,pageSize);
         assertEquals(3,offerRepo.findAllByMerchantIdAndValidUntilIsGreaterThan(Long.valueOf(1),criteria, pageable).getContent().size());
@@ -199,18 +216,16 @@ public class OfferRepoTest {
         Offer valid = TestObjectsFactory.getOfferInstanceWithOutMerchant()
                 .setValidUntil(TestUtils.dateTimeParser("2018-10-09T22:28:55+00:00"))
                 .setOfferState(OfferState.ACTIVE).setId(null);
-        merchantObj.addOffer(invalid);
-        merchantObj.addOffer(invalid1);
-        merchantObj.addOffer(invalid2);
-        merchantObj.addOffer(valid);
-        merchantRepo.save(merchantObj);
+        offerRepo.save(invalid.setMerchant(merchantObj));
+        offerRepo.save(invalid1.setMerchant(merchantObj));
+        offerRepo.save(invalid2.setMerchant(merchantObj));
+        offerRepo.save(valid.setMerchant(merchantObj));
+
         int pageSize = 3;
         Pageable pageable = PageRequest.of(0,pageSize);
         Pageable pageable1 = PageRequest.of(1,pageSize);
         //One extra offer from setUp method
         assertEquals(3,offerRepo.findAllByMerchantIdAndAndValidUntilLessThan(merchantObj.getId(),criteria, pageable).getContent().size());
-        //Next page should have 1 element since we added offer with expirity date 2010 in setUp method
-        assertEquals(1,offerRepo.findAllByMerchantIdAndAndValidUntilLessThan(merchantObj.getId(),criteria, pageable1).getContent().size());
     }
 
 

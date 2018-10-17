@@ -68,7 +68,7 @@ public class MerchantEntityValidationTest {
     @Test
     public void shouldHaveNoViolations() {
         Set<ConstraintViolation<Merchant>> violations
-                = validator.validate(TestObjectsFactory.getMerchantInstanceEmptyOfferSet());
+                = validator.validate(TestObjectsFactory.getMerchantInstance());
         validator.getConstraintsForClass(Merchant.class);
         assertTrue(violations.isEmpty());
     }
@@ -78,7 +78,7 @@ public class MerchantEntityValidationTest {
     {
         Set<ConstraintViolation<Merchant>> violations
                 = validator.validate(TestObjectsFactory
-                .getAmerchantInstanceWithOfferSet(1)
+                .getMerchantInstance()
                 .setMerchantName(""));
         validator.getConstraintsForClass(Merchant.class);
         //log.info(violations.iterator().next().getPropertyPath());
@@ -93,7 +93,7 @@ public class MerchantEntityValidationTest {
     {
         Set<ConstraintViolation<Merchant>> violations
                 = validator.validate(TestObjectsFactory
-                .getAmerchantInstanceWithOfferSet(1)
+                .getMerchantInstance()
                 .setMerchantName(null));
         validator.getConstraintsForClass(Merchant.class);
         //log.info(violations.iterator().next().getPropertyPath());

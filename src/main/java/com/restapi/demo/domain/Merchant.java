@@ -1,22 +1,24 @@
 package com.restapi.demo.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import io.swagger.annotations.ApiModelProperty;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.hibernate.envers.AuditJoinTable;
+import org.hibernate.envers.AuditMappedBy;
+import org.hibernate.envers.Audited;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 
 import javax.persistence.*;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
-import java.time.ZonedDateTime;
+
 
 import java.util.*;
 
@@ -37,8 +39,8 @@ public final class Merchant extends AuditModel<String>{
      */
     @Id
     @Column(nullable = false, name = "MERCHANT_ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(notes = "Database generated offer id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @ApiModelProperty(notes = "Database generated offer id", readOnly = true)
     private Long id;
 
 
@@ -62,28 +64,6 @@ public final class Merchant extends AuditModel<String>{
     @Column(name = "COMPANY_NAME")
     @ApiModelProperty(notes = "Company associated with merchant")
     private String companyName;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "merchants", referencedColumnName = "MERCHANT_ID", nullable = false)
-    private Set<Offer> offersSet = new HashSet<>();
-
-    //This setter only to be used for entity testing, using it with JPA
-    // will cause persistent collection to be overwritten
-    public Set<Offer> getOffersSet() {
-        return Collections.unmodifiableSet(this.offersSet);
-    }
-
-    //JPA to be used with addOffer method only !
-    public void addOffer(Offer offer)
-    {
-        offer.setMerchant(this);
-        this.offersSet.add(offer);
-    }
-
-    public Merchant setOffersSet(Set<Offer> offersSet) {
-        this.offersSet = offersSet;
-        return this;
-    }
 
     public Long getId() {
         return id;
@@ -130,8 +110,7 @@ public final class Merchant extends AuditModel<String>{
         return Objects.equals(id, merchant.id) &&
                 Objects.equals(merchantName, merchant.merchantName) &&
                 Objects.equals(phonenumber, merchant.phonenumber) &&
-                Objects.equals(companyName, merchant.companyName) &&
-                offersSet.containsAll(merchant.offersSet);
+                Objects.equals(companyName, merchant.companyName);
 
     }
 

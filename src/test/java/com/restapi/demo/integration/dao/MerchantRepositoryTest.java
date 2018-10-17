@@ -1,22 +1,15 @@
 package com.restapi.demo.integration.dao;
 
-import com.restapi.demo.RestServiceBasicApplication;
 import com.restapi.demo.domain.Merchant;
 import com.restapi.demo.repositories.MerchantRepo;
 import com.restapi.demo.testutils.TestObjectsFactory;
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.assertj.core.util.IterableUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
@@ -26,10 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import static org.junit.Assert.*;
@@ -40,7 +31,7 @@ import static org.junit.Assert.*;
  */
 
 /*
- * Annotation below are wrong and horrible :(
+ * Annotation below horrible :(
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @EnableJpaRepositories(basePackages = "com.restapi.demo.repositories")
@@ -64,6 +55,11 @@ import static org.junit.Assert.*;
  *
  * Perhaps I should have created configuration classes and then inject
  * them in @ContextConfiguration
+ *
+ * Couldn't get it working with any different setup but this one.
+ * Dirties context is quite expensive operation slowing down the test
+ * since it forces the whole application context to be re-created
+ * before each test is run
  */
 public class MerchantRepositoryTest {
 
@@ -76,7 +72,7 @@ public class MerchantRepositoryTest {
     @Before
     public void setUp()
     {
-        testObj = TestObjectsFactory.getMerchantInstanceEmptyOfferSet();
+        testObj = TestObjectsFactory.getMerchantInstance();
     }
 
     @After
@@ -106,15 +102,15 @@ public class MerchantRepositoryTest {
     public void findAllByUsername()
     {
         merchantRepo.save(testObj.setMerchantName("NAME1"));
-        merchantRepo.save(TestObjectsFactory.getMerchantInstanceEmptyOfferSet().setId(null).setMerchantName("NAME1"));
+        merchantRepo.save(TestObjectsFactory.getMerchantInstance().setId(null).setMerchantName("NAME1"));
         assertEquals(2,merchantRepo.findAllByMerchantName("NAME1").size());
     }
 
     public void persistTestData()
     {
         merchantRepo.save(testObj);
-        merchantRepo.save(TestObjectsFactory.getMerchantInstanceEmptyOfferSet().setId(null));
-        merchantRepo.save(TestObjectsFactory.getMerchantInstanceEmptyOfferSet().setId(null));
+        merchantRepo.save(TestObjectsFactory.getMerchantInstance().setId(null));
+        merchantRepo.save(TestObjectsFactory.getMerchantInstance().setId(null));
     }
 
     @Test
