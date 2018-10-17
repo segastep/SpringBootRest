@@ -80,25 +80,53 @@ public class OfferController {
     public Offer createOffer(@PathVariable (value = "merchantId") Long merchantId,
                                @Valid @RequestBody Offer offer)
     {
-        //Offer updatedOffer = offer.getValidUntil().isBefore(ZonedDateTime.now()) ?
-         //       offer.setOfferState(OfferState.ACTIVE) : offer.setOfferState(OfferState.ACTIVE);
+        Offer updatedOffer = offer.getValidUntil().isBefore(ZonedDateTime.now()) ?
+              offer.setOfferState(OfferState.ACTIVE) : offer.setOfferState(OfferState.ACTIVE);
 
         return merchantRepo.findById(merchantId).map(merchant -> {
-            logger.info("Merchant: " +  merchant.toString());
+            //logger.info("Merchant: " +  merchant.toString());
+            //logger.info(offer.toString());
+            updatedOffer.setMerchant(merchant);
             logger.info(offer.toString());
-            offer.setMerchant(merchant);
-            logger.info(offer.toString());
-            return offerRepo.save(offer);
+            return offerRepo.save(updatedOffer);
         }).orElseThrow(() -> new ResourceNotFoundException("MerchantId " + merchantId + " not found"));
     }
 
-    //@PutMapping("/posts/{postId}/comments/{commentId}")
-    //public Comment updateOffer(@PathVariable (value = "postId") Long postId,
-    //                             @PathVariable (value = "commentId") Long commentId,
-    //                             @Valid @RequestBody Comment commentRequest) {
-    //    if(!postRepository.existsById(postId)) {
-    //        throw new ResourceNotFoundException("PostId " + postId + " not found");
-    //    }
+    /**
+     * With account authorization the id of the user can be
+     * used rather than passing merchId from a mapping as
+     * a parameter, mapping then can be changed to
+     * "/offers/{offerId} where the update method will
+     * be fetch the specified offer ID and check if it
+     * belongs to that user and if does only then will
+     * perform update
+     */
+    @PutMapping("/{merchantId}/offers/{offerId}")
+    public Offer updateOffer(@PathVariable (value = "merchnantId") Long merchantId,
+                             @PathVariable (value = "offerId") Long offerId,
+                             @Valid @RequestBody Offer offerRequest)
+    {
+        if(!merchantRepo.existsById(merchantId))
+        {
+            throw new ResourceNotFoundException("No merchant with id " + merchantId + "found!");
+        }
+        return offerRepo.findById(offerId).map(offer ->
+          {
+
+              OfferState state = offerRequest.getValidUntil().isBefore(ZonedDateTime.now()) ?
+                                    OfferState.ACTIVE : OfferState.EXPIRED;
+                offer.setMerchant(offerRequest.getMerchant())
+                        .setValidUntil(offerRequest.getValidUntil())
+                        .setDescription(offerRequest.getDescription())
+                        .setOfferState(state)
+                        .setPrice(offerRequest.getPrice())
+                        .setCurrency(offerRequest.getCurrency());
+                return offerRepo.save(offer);
+          }).orElseThrow(() -> new ResourceNotFoundException("On offer with id: " + offerId + "exists!"))
+    }
+
+    
+
 
 
 }
