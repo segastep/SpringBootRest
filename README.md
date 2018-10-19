@@ -1,7 +1,7 @@
 # SpringBootRest
 
 
-###Known issues 
+#### Known issues 
 
 Post requests will render the full schema rather than the fields, which are needed to post an offer.
 This is due to swagger lacking support of multiples schemas for different requests.
@@ -33,13 +33,13 @@ But actually the one needed to create an offer is:
 }
 ```
 
-#####Things that could have been handle better
+##### Things that could have been handle better
 
 1. Price and currency
 + Currency is currently saved as string value which is quite bad, should have at least made it an enum of to have researched other means to handle it
 + Might have been better if used Monetary type to handle them both I guess
 
-#####Testing
+##### Testing
 Didn't really built the controllers using TDD approach, I rather implemented and tested them through Swagger since it was faster and I spent quite a low time on this already.
 
 If tests are run through gradle they will fail, this is due to Spring Context getting dirty.
@@ -49,6 +49,6 @@ spent quite a lot of time trying to get it working but couldn't unfortunately. T
 
 Just run the test classes one by one if needed and all tests should pass.
 
-#####Commits
+##### Commits
 
 I had the project in another repository, so you can see some commits that are functionality added with no tests, well actually these were partial commits of things I was sure will be used. Only the controllers weren't built using TDD, aplogies.
