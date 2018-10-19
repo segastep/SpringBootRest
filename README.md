@@ -1,5 +1,7 @@
 # SpringBootRest
-####Known issues 
+
+
+###Known issues 
 
 Post requests will render the full schema rather than the fields, which are needed to post an offer.
 This is due to swagger lacking support of multiples schemas for different requests.
