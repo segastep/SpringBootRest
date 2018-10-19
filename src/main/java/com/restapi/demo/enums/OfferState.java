@@ -1,6 +1,7 @@
 package com.restapi.demo.enums;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,7 +12,6 @@ import java.util.Arrays;
  *
  * Offer to accept only one of these states
  */
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OfferState implements Serializable {
     ACTIVE("ACTIVE"),
     EXPIRED("EXPIRED"),
@@ -23,6 +23,12 @@ public enum OfferState implements Serializable {
     OfferState(String state)
     {
         this.state = state.toUpperCase();
+    }
+
+    @JsonValue
+    public String getOfferState()
+    {
+        return state;
     }
 
 }

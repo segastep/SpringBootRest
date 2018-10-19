@@ -2,6 +2,7 @@ package com.restapi.demo.domainTests.merchant;
 
 import com.restapi.demo.domain.Merchant;
 import com.restapi.demo.testutils.TestUtils;
+import io.swagger.models.auth.In;
 import org.assertj.core.api.AbstractAssert;
 
 import java.time.Instant;
@@ -101,20 +102,12 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
         return this;
     }
 
-    String printSet(Set s)
-    {
-
-        return (String) s.stream().map(Object::toString).collect(Collectors.joining(","));
-    }
-
-
-
     MerchantAssert createdAt(String creationTime)
    {
        isNotNull();
 
-       LocalDateTime expectedCreationTime = TestUtils.dateTimeLocalParser(creationTime);
-       LocalDateTime actualCreationTime = actual.getCreatedAt();
+       Instant expectedCreationTime = TestUtils.dateTimeParser(creationTime).toInstant();
+       Instant actualCreationTime = actual.getCreatedAt();
 
        assertThat(actualCreationTime).overridingErrorMessage(
                "Expected creation time to be <%s> but was <%s>",
@@ -126,8 +119,8 @@ final class MerchantAssert extends AbstractAssert<MerchantAssert, Merchant> {
 
    public MerchantAssert updatedAt(String expLastUpdatedTime)
    {
-       LocalDateTime expectedLastUpdatedTime = TestUtils.dateTimeLocalParser(expLastUpdatedTime);
-       LocalDateTime actualLastUpdatedTime = actual.getUpdatedAt();
+       Instant expectedLastUpdatedTime = TestUtils.dateTimeParser(expLastUpdatedTime).toInstant();
+       Instant actualLastUpdatedTime = actual.getUpdatedAt();
 
        assertThat(actualLastUpdatedTime).overridingErrorMessage(
                "Expected last update time was <%s> but actual was <%s>",

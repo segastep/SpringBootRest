@@ -2,10 +2,13 @@ package com.restapi.demo.domainTests.merchant;
 
 import com.restapi.demo.domain.Merchant;
 import com.restapi.demo.testutils.TestObjectsFactory;
+import org.hibernate.type.TimeZoneType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.TimeZone;
 
 
 /**
@@ -13,7 +16,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @project rest-service-basic
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MerchantTest.class)
 public class MerchantTest {
 
     //private static Logger logger = LogManager.getLogger(MerchantTest.class);
@@ -41,6 +43,7 @@ public class MerchantTest {
 
     @Test(expected = NullPointerException.class)
     @Ignore
+    //Covered by validation tests
     public void whenNameIsNullShouldThrowException()
     {
         testObj.setMerchantName(null);

@@ -1,24 +1,11 @@
 package com.restapi.demo.domain;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonView;
-
 import io.swagger.annotations.ApiModelProperty;
-
-
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.AuditJoinTable;
-import org.hibernate.envers.AuditMappedBy;
-import org.hibernate.envers.Audited;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
-
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
-
 
 import java.util.*;
 
@@ -43,7 +30,6 @@ public final class Merchant extends AuditModel<String>{
     @ApiModelProperty(notes = "Database generated offer id", readOnly = true)
     private Long id;
 
-
     @NotNull
     @Column(nullable = false, name = "MERCHANT_NAME")
     @Type(type = "nstring")
@@ -53,7 +39,6 @@ public final class Merchant extends AuditModel<String>{
 
     @Type(type="nstring")
     @Size(min = 6, max = 30)
-    @NotNull
     @Column(name = "PHONE_NUMBER")
     @ApiModelProperty(notes = "Phone number associated with merchant, can be null")
     // Alternatively Phonenumber class can be used for validity checks etc
@@ -64,6 +49,10 @@ public final class Merchant extends AuditModel<String>{
     @Column(name = "COMPANY_NAME")
     @ApiModelProperty(notes = "Company associated with merchant")
     private String companyName;
+
+
+    @OneToMany
+    Set<Offer> offerSet;
 
     public Long getId() {
         return id;

@@ -20,7 +20,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'com.restapi.demo'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.10
 
 repositories {
 	mavenCentral()
@@ -45,14 +45,14 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-data-rest')
     runtimeOnly('org.springframework.boot:spring-boot-starter-logging')
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
+    
 
     //Data storage/DAO
 	runtimeOnly('com.h2database:h2')
     runtimeOnly('org.hibernate:hibernate-core:5.3.6.Final') {transitive= true}
     runtimeOnly('org.hibernate:hibernate-entitymanager:5.3.6.Final') {transitive= true}
     runtimeOnly('javax.xml.bind:jaxb-api:2.3.0')
-    //DateTimne
-    //compile('org.hibernate:hibernate-java8:5.3.6.Final')
+    
     //Auto entity properties validation
     compile('org.hibernate:hibernate-envers:5.3.6.Final')
     compile('org.hibernate:hibernate-validator:6.0.13.Final')

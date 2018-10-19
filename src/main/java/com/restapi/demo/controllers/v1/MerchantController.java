@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -51,21 +52,21 @@ public class MerchantController{
        this.merchantRepo = merchantRepo;
     }
 
-    @ApiOperation(value = "View a list of available products",response = Iterable.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success."),
-            @ApiResponse(code = 401, message = "Unauthorized."),
-            @ApiResponse(code = 403, message = "Forbidden."),
-            @ApiResponse(code = 404, message = "Not found")
-    }
-    )
+    @ApiOperation(value = "View a list of available merchants")
     @GetMapping("/merchants")
     public Page<Merchant> getAllMerchants(@RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
                                           @RequestParam(value = "size", defaultValue = "50", required = false) Integer size,
                                           @RequestParam(value= "sort", defaultValue = "id", required = false) String sort)
-
     {
         return merchantRepo.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
+    }
+
+    @ApiOperation(value = "Find merchant by ID")
+    @GetMapping("/merchants/{id}")
+    public Merchant getMerchantById(@RequestParam Long merchantId)
+    {
+        return merchantRepo.findById(merchantId).orElseThrow(
+                () -> new ResourceNotFoundException("No merchant with id: " + merchantId + " found!"));
     }
 
     @ApiOperation(value = "Delete all merchants")
@@ -77,7 +78,7 @@ public class MerchantController{
     }
 
 
-    @ApiOperation(value = "Create new merchant, supports injection of offers")
+    @ApiOperation(value = "Create new merchant")
     @PostMapping("/merchants")
     public Merchant createMerchant(@Valid @RequestBody Merchant merchant)
     {
@@ -106,10 +107,4 @@ public class MerchantController{
             return ResponseEntity.ok().build();
         }).orElseThrow(() -> new ResourceNotFoundException("MerchantId: " + merchantId + "not found"));
     }
-
-
-
-
-
-
 }

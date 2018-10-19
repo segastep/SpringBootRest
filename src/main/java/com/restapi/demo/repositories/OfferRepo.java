@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -48,4 +49,9 @@ public interface OfferRepo extends JpaRepository<Offer, Long> {
     @Async
     Page<Offer> findAllByMerchantIdAndValidUntilIsGreaterThan(Long id, ZonedDateTime time,Pageable page);
 
+    @Async
+    List<Offer> findAllByMerchantId(Long merchantId);
+
+    @Transactional
+    void deleteAllByMerchantId(Long merchnatId);
 }

@@ -1,21 +1,28 @@
 package com.restapi.demo.domain;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jsr310.deser.key.ZonedDateTimeKeyDeserializer;
 import com.restapi.demo.enums.OfferState;
+import com.restapi.demo.serializers.ZonedDateTimeDeserializer;
+import com.restapi.demo.serializers.ZonedDateTimeSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.core.Constants;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+
+import static org.hibernate.type.descriptor.java.JdbcDateTypeDescriptor.DATE_FORMAT;
 
 /**
  * @author G.Nikolov on 10/10/18
@@ -28,12 +35,10 @@ import java.util.Objects;
 public final class Offer extends AuditModel<String>{
 
     @Id
-    //@NotNull(message = "Id cannot be null")
     @Column(nullable = false, name = "OFFER_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(notes = "Database generated offer id")
     private Long id;
-
 
     @Lob
     @NotNull(message = "Description cannot be null")
@@ -63,27 +68,28 @@ public final class Offer extends AuditModel<String>{
     @NotNull(message = "Valid until field cannot be null")
     @Column(name = "VALID_UNTIL")
     @ApiModelProperty(notes = "Offer expiry time")
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
+    @JsonSerialize(using = ZonedDateTimeSerializer.class)
     private ZonedDateTime validUntil;
 
     //@NotNull(message = "Offer state cannot be null !")
     @Enumerated(EnumType.STRING)
     @Column(name = "OFFER_STATE", nullable = false)
     @ApiModelProperty(notes = "Status of offer", readOnly = true)
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     private OfferState offerState;
 
     public Long getId() {
         return id;
     }
 
-    //All fields of merchnat object will be rendered in post request in
-    // swagger UI different post/request schemas will be supported as of
-    //swagger 3.00 :(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    //Alternatively, uncomment the lines below to show the Merchant reference just as an ID
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    //@ApiModelProperty(notes = "The id of the merchant owning the offer")
+    @ApiModelProperty(notes = "The id of the merchant owning the offer", readOnly = true)
     protected Merchant merchant;
 
     public Offer setId(Long id) {
@@ -105,7 +111,7 @@ public final class Offer extends AuditModel<String>{
     }
 
     public Offer setValidUntil(ZonedDateTime validUntil) {
-        this.validUntil = validUntil;
+        this.validUntil = ZonedDateTime.ofInstant(validUntil.toInstant(), ZoneId.of("UTC"));
         return this;
     }
 

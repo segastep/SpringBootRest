@@ -50,8 +50,8 @@ public class TestObjectsFactory {
                 .setCurrency(OFFER_CURRENCY)
                 .setDescription(OFFER_DESCRIPT)
                 .setOfferState(OFFER_STATE);
-        offer.setCreatedAt(TestUtils.dateTimeLocalParser(OFFER_CREATED_AT));
-        offer.setUpdatedAt(TestUtils.dateTimeLocalParser(OFFER_UPDATED_AT));
+        offer.setCreatedAt(TestUtils.dateTimeParser(OFFER_CREATED_AT).toInstant());
+        offer.setUpdatedAt(TestUtils.dateTimeParser(OFFER_UPDATED_AT).toInstant());
         return offer;
 
     }
@@ -73,8 +73,8 @@ public class TestObjectsFactory {
                 .setMerchantName(MERCHANT_NAME)
                 .setCompanyName(COMPANY_NAME)
                 .setPhonenumber(PHONE_NUMBER);
-                m.setCreatedAt(TestUtils.dateTimeLocalParser(CREATION_DATE));
-                m.setUpdatedAt(TestUtils.dateTimeLocalParser(UPDATED_ON));
+                m.setCreatedAt(TestUtils.dateTimeParser(CREATION_DATE).toInstant());
+                m.setUpdatedAt(TestUtils.dateTimeParser(UPDATED_ON).toInstant());
 
                 return m;
     }

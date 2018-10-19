@@ -13,6 +13,9 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+
 /**
  * @author G.Nikolov on 10/10/18
  * @project rest-service-basic

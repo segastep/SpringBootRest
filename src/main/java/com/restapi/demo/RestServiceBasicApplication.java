@@ -1,5 +1,6 @@
 package com.restapi.demo;
 
+import com.restapi.demo.config.JacksonConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,14 +16,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  *
  * Spring application runner class
  */
-
+@ComponentScan(basePackageClasses = {
+		JacksonConfiguration.class
+})
 @SpringBootApplication
 @EnableJpaAuditing
 public class RestServiceBasicApplication {
 
-
 	public static void main(String[] args) {
-
 		SpringApplication.run(RestServiceBasicApplication.class, args);
 	}
 }
